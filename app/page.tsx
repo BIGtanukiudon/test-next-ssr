@@ -1,7 +1,34 @@
 import Form from "@/components/Form";
 import Image from "next/image";
 
-export default function Home() {
+const API_ENDPOINT = process.env.API_ENDPOINT ?? "http://localhost:8080";
+
+const fetchHello = async () => {
+  return await fetch(`${API_ENDPOINT}/hello?name=taro_hanako`)
+    .then(async (r) => {
+      const json = await r.json();
+
+      if (!r.ok) {
+        throw new Error("Json parse error");
+      }
+
+      const hello = json.hello;
+
+      if (hello != null && typeof hello === "string") {
+        return hello;
+      }
+
+      return null;
+    })
+    .catch((error) => {
+      console.error(error);
+      return null;
+    });
+};
+
+export default async function Home() {
+  const hello = await fetchHello();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -108,6 +135,10 @@ export default function Home() {
             Instantly deploy your Next.js site to a shareable URL with Vercel.
           </p>
         </a>
+      </div>
+
+      <div>
+        <h1 className="text-4xl font-bold text-center">{hello}</h1>
       </div>
 
       <Form />
